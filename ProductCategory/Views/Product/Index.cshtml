@@ -1,0 +1,97 @@
+﻿@model IEnumerable<ProductCategory.Models.ProductViewModel>
+
+@{
+    ViewData["Title"] = "Products";
+    var term = ViewData["Term"] as string ?? "";
+    var currentPage = (int)ViewData["Page"]!;
+    var pages = (int)ViewData["Pages"]!;
+    var totalCount = (int)ViewData["TotalCount"]!;
+    var sortBy = ViewData["SortBy"] as string ?? "ProductName";
+    var descending = (bool)ViewData["Descending"]!;
+    var idDescending = sortBy == "ProductId" && !descending;
+    var nameDescending = sortBy == "ProductName" && !descending;
+    var priceDescending = sortBy == "Price" && !descending;
+    var categoryDescending = sortBy == "CategoryName" && !descending;
+}
+
+<h1>Products</h1>
+
+<div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+    <a asp-controller="Category" asp-action="Index" class="btn btn-outline-secondary">Manage Categories</a>
+    <form asp-action="Index" method="get" class="d-flex ms-auto" role="search">
+        <input type="search" name="term" value="@term" class="form-control me-2" placeholder="Search products..." aria-label="Search products" />
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+        @if (!string.IsNullOrWhiteSpace(term))
+        {
+            <a asp-action="Index" class="btn btn-link">Clear</a>
+        }
+    </form>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th><a asp-action="Index" asp-route-term="@term" asp-route-sortBy="ProductId" asp-route-descending="@idDescending">ProductId</a></th>
+            <th><a asp-action="Index" asp-route-term="@term" asp-route-sortBy="ProductName" asp-route-descending="@nameDescending">ProductName</a></th>
+            <th><a asp-action="Index" asp-route-term="@term" asp-route-sortBy="Price" asp-route-descending="@priceDescending">ProductPrice</a></th>
+            <th><a asp-action="Index" asp-route-term="@term" asp-route-sortBy="CategoryName" asp-route-descending="@categoryDescending">CategoryName</a></th>
+            <th>File</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ProductId</td>
+                <td>@item.ProductName</td>
+                <td>@item.Price.ToString("0.00")</td>
+                <td>@item.CategoryName</td>
+                <td>
+                    @if (!string.IsNullOrWhiteSpace(item.DataFileName))
+                    {
+                        <a asp-action="Read" asp-route-id="@item.ProductId">Download</a>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ProductId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.ProductId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ProductId">Delete</a>
+                </td>
+            </tr>
+        }
+        @if (!Model.Any())
+        {
+            <tr><td colspan="6" class="text-center text-muted">No products found.</td></tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="6">
+                <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between">
+                    <span>Total: @totalCount product(s)</span>
+                    <div class="d-flex align-items-center gap-2">
+                        @if (currentPage > 1)
+                        {
+                            <a class="btn btn-sm btn-outline-secondary" asp-action="Index" asp-route-term="@term" asp-route-page="@(currentPage - 1)" asp-route-sortBy="@sortBy" asp-route-descending="@descending">Previous</a>
+                        }
+                        <form asp-action="Index" method="get" class="d-flex align-items-center gap-2">
+                            <input type="hidden" name="term" value="@term" />
+                            <input type="hidden" name="sortBy" value="@sortBy" />
+                            <input type="hidden" name="descending" value="@descending" />
+                            <label for="pageNumber">Page</label>
+                            <input id="pageNumber" type="number" name="page" min="1" max="@pages" value="@currentPage" class="form-control form-control-sm" style="width: 5rem" />
+                            <span>of @pages</span>
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Go</button>
+                        </form>
+                        @if (currentPage < pages)
+                        {
+                            <a class="btn btn-sm btn-outline-secondary" asp-action="Index" asp-route-term="@term" asp-route-page="@(currentPage + 1)" asp-route-sortBy="@sortBy" asp-route-descending="@descending">Next</a>
+                        }
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </tfoot>
+</table>

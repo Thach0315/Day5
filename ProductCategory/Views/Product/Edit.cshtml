@@ -1,0 +1,42 @@
+@model ProductCategory.Models.Product
+
+@{ ViewData["Title"] = "Edit Product"; }
+
+<h1>Edit Product</h1>
+<hr />
+<div class="row">
+    <div class="col-md-5">
+        <form asp-action="Edit" asp-route-id="@Model.ProductId" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="ProductId" />
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="ProductName" class="form-label"></label>
+                <input asp-for="ProductName" class="form-control" />
+                <span asp-validation-for="ProductName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ProductPrice" class="form-label"></label>
+                <input asp-for="ProductPrice" class="form-control" />
+                <span asp-validation-for="ProductPrice" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CategoryId" class="form-label">Category</label>
+                <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select"></select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                @if (!string.IsNullOrWhiteSpace(Model.DataFileName))
+                {
+                    <p>Current attachment: <a asp-action="Read" asp-route-id="@Model.ProductId">@Model.DataFileName</a></p>
+                }
+                <label for="upload" class="form-label">Replace attachment (PDF, DOC, DOCX or TXT; max 10 MB)</label>
+                <input id="upload" name="upload" type="file" class="form-control" accept=".pdf,.doc,.docx,.txt" />
+                <span class="text-danger" data-valmsg-for="upload"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
